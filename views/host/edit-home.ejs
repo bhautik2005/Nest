@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet" href="/output.css" />
+  <!-- <link rel="stylesheet" href="/home.css" /> -->
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+    
+    * {
+      font-family: 'Inter', sans-serif;
+    }
+    
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+    }
+    
+    .glass-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);
+    }
+    
+    .input-modern {
+      transition: all 0.3s ease;
+      border: 2px solid #e2e8f0;
+      background: rgba(255, 255, 255, 0.9);
+    }
+    
+    .input-modern:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      transform: translateY(-2px);
+    }
+    
+    .input-modern:hover {
+      border-color: #cbd5e0;
+    }
+    
+    .btn-gradient {
+      background: linear-gradient(135deg, #ff5a5f 0%, #ff385c 100%);
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(255, 56, 92, 0.3);
+    }
+    
+    .btn-gradient:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(255, 56, 92, 0.4);
+      background: linear-gradient(135deg, #ff385c 0%, #e91e63 100%);
+    }
+    
+    .btn-gradient:active {
+      transform: translateY(-1px);
+    }
+    
+    .floating-label {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: white;
+      padding: 0 8px;
+      color: #64748b;
+      font-size: 16px;
+      pointer-events: none;
+      transition: all 0.3s ease;
+    }
+    
+    .input-group {
+      position: relative;
+    }
+    
+    .input-group input:focus + .floating-label,
+    .input-group input:not(:placeholder-shown) + .floating-label {
+      top: -1px;
+      font-size: 12px;
+      color: #667eea;
+      font-weight: 600;
+    }
+    
+    .pulse-bg {
+      animation: pulse-bg 3s ease-in-out infinite;
+    }
+    
+    @keyframes pulse-bg {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 0.1; }
+    }
+    
+    .float-animation {
+      animation: float 6s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-20px); }
+    }
+    
+    .slide-in {
+      animation: slideIn 0.8s ease-out;
+    }
+    
+    @keyframes slideIn {
+      from { 
+        opacity: 0; 
+        transform: translateY(50px); 
+      }
+      to { 
+        opacity: 1; 
+        transform: translateY(0); 
+      }
+    }
+    
+    .header-gradient {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .file-upload-area {
+      border: 2px dashed #cbd5e0;
+      border-radius: 12px;
+      padding: 24px;
+      text-align: center;
+      background: rgba(255, 255, 255, 0.5);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .file-upload-area:hover {
+      border-color: #667eea;
+      background: rgba(102, 126, 234, 0.05);
+    }
+    
+    .file-upload-area input[type="file"] {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+    }
+    
+    .stats-card {
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      transition: all 0.3s ease;
+    }
+    
+    .stats-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .decorative-blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(40px);
+      opacity: 0.3;
+      animation: blob 8s ease-in-out infinite;
+    }
+    
+    @keyframes blob {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      25% { transform: translate(20px, -30px) scale(1.1); }
+      50% { transform: translate(-20px, 20px) scale(0.9); }
+      75% { transform: translate(30px, 10px) scale(1.05); }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <%- include('../partials/nav') %>
+  </header>
+  
+  <!-- Decorative Background Elements -->
+  <div class="fixed inset-0 overflow-hidden pointer-events-none">
+    <div class="decorative-blob w-96 h-96 bg-pink-300 absolute top-20 -right-20" style="animation-delay: 0s;"></div>
+    <div class="decorative-blob w-80 h-80 bg-blue-300 absolute -bottom-20 -left-20" style="animation-delay: 2s;"></div>
+    <div class="decorative-blob w-64 h-64 bg-purple-300 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" style="animation-delay: 4s;"></div>
+  </div>
+  
+  <div class="relative z-10 p-5 mx-auto max-w-6xl">
+    <!-- Hero Section -->
+    <div class="text-center mb-16 slide-in">
+      
+      
+      <h1 class="text-6xl md:text-7xl font-bold text-white mb-6 float-animation">
+        List Your <span class="text-pink-300">Dream Home</span>
+      </h1>
+      <p class="text-xl text-white opacity-90 mb-8 max-w-2xl mx-auto">
+        Join millions of hosts worldwide and transform your space into a source of income
+      </p>
+    </div>
+
+    <!-- Main Form Container -->
+    <div class="glass-card rounded-3xl shadow-2xl overflow-hidden slide-in max-w-2xl mx-auto">
+      <div class="bg-gradient-to-r from-indigo-600 to-purple-600 p-6">
+        <h2 class="text-4xl font-bold text-white text-center flex items-center justify-center">
+          <span class="mr-3">🏠</span>
+          <%= editing ? "Edit" : "Register" %> your Home On AirBnB
+        </h2>
+        <p class="text-center text-indigo-100 mt-2">
+          Fill in the details below to get started
+        </p>
+      </div>
+      
+      <form enctype="multipart/form-data" action="/host/<%= editing ? "edit-home" : "add-home" %>" method="POST" class="p-8 space-y-6">
+        <!-- Hidden ID Field -->
+        <input type="hidden" name="id" value="<%= editing ? home._id : "" %>">
+        
+        <!-- House Name -->
+        <div class="input-group">
+          <input 
+            class="input-modern w-full p-4 rounded-xl text-lg font-medium placeholder-transparent" 
+            type="text" 
+            name="houseName" 
+            id="houseName"
+            placeholder="Enter a house name"
+            value="<%= editing ? home.houseName : "" %>"
+            required>
+          <label for="houseName" class="floating-label">
+            🏡 House Name
+          </label>
+        </div>
+        
+        <!-- Price -->
+        <div class="input-group">
+          <input 
+            class="input-modern w-full p-4 rounded-xl text-lg font-medium placeholder-transparent" 
+            type="number" 
+            name="price" 
+            id="price"
+            placeholder="Price per Night"
+            value="<%= editing ? home.price : "" %>"
+            required>
+          <label for="price" class="floating-label">
+            💰 Price per Night
+          </label>
+        </div>
+        
+        <!-- Location -->
+        <div class="input-group">
+          <input 
+            class="input-modern w-full p-4 rounded-xl text-lg font-medium placeholder-transparent" 
+            type="text" 
+            name="location" 
+            id="location"
+            placeholder="Location"
+            value="<%= editing ? home.location : "" %>"
+            required>
+          <label for="location" class="floating-label">
+            📍 Location
+          </label>
+        </div>
+        
+        <!-- Photo Upload -->
+        <div class="space-y-2">
+          <label class="block text-sm font-semibold text-gray-700 mb-2">
+            📸 Property Photo
+          </label>
+          <div class="file-upload-area">
+            <input 
+              class="input-modern" 
+              type="file" 
+              name="photo" 
+              accept="image/*"
+              <%= editing ? "" : "required" %>
+          >
+            <div class="pointer-events-none">
+              <div class="text-4xl mb-2">📷</div>
+              <div class="text-lg font-semibold text-gray-700">Choose a photo</div>
+              <div class="text-sm text-gray-500 mt-1">Drag and drop or click to browse</div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Description -->
+        <div class="input-group">
+          <input 
+            class="input-modern w-full p-4 rounded-xl text-lg font-medium placeholder-transparent" 
+            type="text" 
+            name="description" 
+            id="description"
+            placeholder="Enter Description"
+            value="<%= editing ? home.description : "" %>"
+            required>
+          <label for="description" class="floating-label">
+            📝 Description
+          </label>
+        </div>
+        
+        <!-- Submit Button -->
+        <button 
+          type="submit" 
+          class="btn-gradient w-full p-4 rounded-xl text-xl font-bold text-white">
+          <span class="flex items-center justify-center">
+            <span class="mr-2">🚀</span>
+            <%= editing ? "Edit Home" : "Register Home" %>
+          </span>
+        </button>
+      </form>
+      
+      <!-- Features Section -->
+      <div class="bg-gray-50 p-8">
+        <h3 class="text-2xl font-bold text-center text-gray-800 mb-6">
+          Why Choose Airbnb?
+        </h3>
+        <div class="grid md:grid-cols-3 gap-6">
+          <div class="text-center p-4 bg-white rounded-xl shadow-sm hover:shadow-md transition-all">
+            <div class="text-3xl mb-3">🛡️</div>
+            <h4 class="font-semibold text-gray-800 mb-2">Host Protection</h4>
+            <p class="text-sm text-gray-600">$1M+ liability coverage included</p>
+          </div>
+          <div class="text-center p-4 bg-white rounded-xl shadow-sm hover:shadow-md transition-all">
+            <div class="text-3xl mb-3">⚡</div>
+            <h4 class="font-semibold text-gray-800 mb-2">Instant Booking</h4>
+            <p class="text-sm text-gray-600">Get booked faster with instant reservations</p>
+          </div>
+          <div class="text-center p-4 bg-white rounded-xl shadow-sm hover:shadow-md transition-all">
+            <div class="text-3xl mb-3">💡</div>
+            <h4 class="font-semibold text-gray-800 mb-2">Smart Pricing</h4>
+            <p class="text-sm text-gray-600">AI-powered pricing optimization</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    // Enhanced interactions
+    document.addEventListener('DOMContentLoaded', function() {
+      // File upload visual feedback
+      const fileInput = document.querySelector('input[type="file"]');
+      const fileUploadArea = document.querySelector('.file-upload-area');
+      
+      fileInput.addEventListener('change', function(e) {
+        if (e.target.files.length > 0) {
+          fileUploadArea.style.borderColor = '#10b981';
+          fileUploadArea.style.background = 'rgba(16, 185, 129, 0.1)';
+          fileUploadArea.querySelector('.pointer-events-none').innerHTML = `
+            <div class="text-4xl mb-2">✅</div>
+            <div class="text-lg font-semibold text-green-700">Photo Selected</div>
+            <div class="text-sm text-green-600 mt-1">${e.target.files[0].name}</div>
+          `;
+        }
+      });
+      
+      // Form submission enhancement
+      const form = document.querySelector('form');
+      const submitBtn = form.querySelector('button[type="submit"]');
+      
+      form.addEventListener('submit', function(e) {
+        submitBtn.innerHTML = `
+          <span class="flex items-center justify-center">
+            <span class="mr-2">⏳</span>
+            Processing...
+          </span>
+        `;
+        submitBtn.disabled = true;
+      });
+      
+      // Input focus effects
+      const inputs = document.querySelectorAll('input[type="text"], input[type="number"]');
+      inputs.forEach(input => {
+        input.addEventListener('focus', function() {
+          this.parentElement.style.transform = 'scale(1.02)';
+        });
+        
+        input.addEventListener('blur', function() {
+          this.parentElement.style.transform = 'scale(1)';
+        });
+      });
+    });
+  </script>
+</body>
+</html>

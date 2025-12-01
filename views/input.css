@@ -1,0 +1,5 @@
+/*  
+npx tailwindcss -i ./views/input.css -o ./views/output.css -- base; */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>airbnb Home</title>
+  <link rel="stylesheet" href="/output.css" />
+  <style>
+    .card-hover {
+      transition: all 0.3s ease;
+    }
+
+    .card-hover:hover {
+      transform: translateY(-10px) scale(1.02);
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+    }
+
+    .price-badge {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      animation: pulse-price 2s ease-in-out infinite;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <%- include('../partials/nav') %>
+  </header>
+  <div class="text-center mb-12 fade-in pt-12 px-6">
+    <h1 class="text-5xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-4">
+      Welecome To Airbnb
+    </h1>
+    <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+      Discover amazing places to stay around the world. Each home is carefully selected for your perfect getaway.
+    </p>
+  </div>
+  <div class="p-5 w-full mx-auto flex flex-col justify-center items-center">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <% registerHouse.forEach(home => { %>
+        <div class="card-hover bg-white rounded-3xl overflow-hidden shadow-xl fade-in" style="animation-delay: 0.1s;">
+          <div class="relative">
+            <img class="w-full h-64 object-cover" src="<%= home.photo %>" alt="Modern Villa">
+            <%- include('../partials/favourite', { home: home }) %>
+            <div class="absolute bottom-4 left-4">
+              <span class="price-badge text-white px-3 py-1 rounded-full text-sm font-semibold">
+                ₹<%= home.price %>/night
+              </span>
+            </div>
+          </div>
+          <div class="p-6">
+            <h3 class="text-xl font-bold text-gray-800 mb-2">
+              <%= home.houseName %>
+            </h3>
+            <p class="text-gray-600 mb-4 flex items-center">
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+              </svg>
+              <%= home.location %>
+            </p>
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-1">
+                <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z">
+                  </path>
+                </svg>
+                <span class="text-sm text-gray-600">4.8 (124 reviews)</span>
+              </div>
+              <a href="/home/<%= home._id %>">
+                <button class="btn-gradient text-white px-4 py-2 rounded-xl text-sm font-medium">
+                  View Details
+                </button>
+              </a>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  </div>
+</body>
+
+</html>
+

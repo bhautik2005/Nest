@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Airbnb Home Details</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            animation: gradientShift 8s ease infinite;
+        }
+
+        @keyframes gradientShift {
+
+            0%,
+            100% {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            }
+
+            50% {
+                background: linear-gradient(135deg, #f093fb 0%, #667eea 50%, #764ba2 100%);
+            }
+        }
+
+        .glass-card {
+            backdrop-filter: blur(25px);
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.1);
+        }
+
+        .floating {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        .glow {
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #ff6b6b, #ff8e8e, #ffa8a8);
+            background-size: 200% 200%;
+            animation: gradientMove 3s ease infinite;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 20px 40px rgba(255, 107, 107, 0.4);
+        }
+
+        @keyframes gradientMove {
+
+            0%,
+            100% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+
+        .pulse-glow {
+            animation: pulseGlow 2s infinite;
+        }
+
+        @keyframes pulseGlow {
+
+            0%,
+            100% {
+                box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+            }
+
+            50% {
+                box-shadow: 0 0 40px rgba(255, 255, 255, 0.6);
+            }
+        }
+
+        .nav-glass {
+            backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .feature-card {
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .image-glow {
+            box-shadow: 0 0 50px rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+
+<body class="gradient-bg">
+    <!-- Navigation -->
+    <nav class="tp-0">
+        <%- include('../partials/nav') %>
+    </nav>
+
+    <!-- Main Content Container -->
+    <div class="h-screen flex items-center justify-center px-6 tp-0 mb-2">
+        <div class="max-w-6xl w-full mb-20">
+            <!-- Main Property Card -->
+            <div class="glass-card rounded-3xl overflow-auto ">
+                <div class="grid md:grid-cols-2 h-[75vh]">
+                    <!-- Image Section -->
+                    <div class="relative overflow-hidden">
+                        <img src="<%=home.photo%>" alt="Luxury Villa" class="w-full h-full object-cover image-glow">
+
+                        <!-- Image Overlays -->
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+
+                        <!-- Top Right Heart -->
+                        <div class="absolute top-4 right-4">
+                            <button class="glass-card p-2 rounded-full hover:scale-110 transition">
+                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z">
+                                    </path>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <!-- Bottom Left Badge -->
+
+                    </div>
+
+                    <!-- Details Section -->
+                    <div class="p-8 flex flex-col justify-between">
+                        <!-- Header -->
+                        <div>
+                            <div class="flex items-center space-x-2 text-sm text-white/70 mb-2">
+                                <span>🏠 Entire home</span>
+                                <span>•</span>
+
+                            </div>
+                            <h1 class="text-3xl font-bold text-white mb-2">
+                                <%=home.houseName%>
+                            </h1>
+                            <p class="text-white/80 flex items-center mb-4">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
+                                    </path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                </svg>
+                                <%=home.location%>
+                            </p>
+                        </div>
+
+                        <!-- Price Section -->
+                        <div class="glass-card p-4 rounded-2xl mb-6 pulse-glow">
+                            <div class="flex items-baseline space-x-2">
+                                <span class="text-3xl font-bold text-white">
+                                    <%=home.price%>
+                                </span>
+                                <span class="text-white/70">/night</span>
+                            </div>
+                            <p class="text-white/60 text-sm">Including taxes and fees</p>
+                        </div>
+
+                        <!-- Features Grid -->
+                        <div class="grid  mb-6">
+                            <div class="feature-card glass-card text-center p-3 rounded-xl">
+                                <span class=" flex flex-start  text-xl font-bold text-white">
+                                    Description
+                                </span>
+
+                                <%= home.description %>
+
+                            </div>
+
+
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <% if(user && user.userType==="guest" ){%>
+                            <div class="flex space-x-3">
+                                <form action="/booking?homeId=<%= home._id %>" method="post">
+                                    <input type="hidden" name="homeId" value="<%= home._id %>">
+                                     <!-- <input type="hidden" name="homeId" value="{{home._id}}"> -->
+                                    <button
+                                        class="btn-primary text-white px-6 py-3 rounded-2xl font-semibold flex-1 shadow-lg">
+                                        Book Now
+                                    </button>
+                                </form>
+                            </div>
+                            <%}%>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+</body>
+
+</html>

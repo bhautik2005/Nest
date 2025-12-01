@@ -1,0 +1,268 @@
+ <!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>airbnb Home</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+
+    .gradient-bg {
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    }
+
+    .glass-nav {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .nav-link {
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .nav-link:before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    .nav-link:hover:before {
+      left: 100%;
+    }
+
+    .nav-link:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .card-hover {
+      transition: all 0.3s ease;
+    }
+
+    .card-hover:hover {
+      transform: translateY(-10px) scale(1.02);
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+    }
+
+    .price-badge {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      animation: pulse-price 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse-price {
+
+      0%,
+      100% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.05);
+      }
+    }
+
+    .btn-gradient {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-gradient:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-gradient:before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    .btn-gradient:hover:before {
+      left: 100%;
+    }
+
+    .fade-in {
+      animation: fadeIn 0.8s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .slide-in {
+      animation: slideIn 0.6s ease-out;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(-30px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    .floating-shapes {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    .shape {
+      position: absolute;
+      opacity: 0.05;
+      animation: float 8s ease-in-out infinite;
+    }
+
+    .shape:nth-child(1) {
+      top: 10%;
+      left: 5%;
+      animation-delay: 0s;
+    }
+
+    .shape:nth-child(2) {
+      top: 50%;
+      right: 5%;
+      animation-delay: 3s;
+    }
+
+    .shape:nth-child(3) {
+      bottom: 10%;
+      left: 15%;
+      animation-delay: 6s;
+    }
+
+    @keyframes float {
+
+      0%,
+      100% {
+        transform: translateY(0px) rotate(0deg);
+      }
+
+      50% {
+        transform: translateY(-30px) rotate(180deg);
+      }
+    }
+
+    .brand-logo {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-weight: 700;
+      font-size: 1.5rem;
+    }
+
+    .heart-animation {
+      transition: all 0.3s ease;
+    }
+
+    .heart-animation:hover {
+      transform: scale(1.2);
+      color: #ef4444;
+    }
+  </style>
+</head>
+
+<body class="gradient-bg min-h-screen relative">
+
+  <!-- Floating Background Shapes -->
+  <div class="floating-shapes">
+    <div class="shape w-32 h-32 bg-purple-600 rounded-full"></div>
+    <div class="shape w-24 h-24 bg-blue-600 rounded-lg"></div>
+    <div class="shape w-16 h-16 bg-indigo-600 rounded-full"></div>
+  </div>
+
+  <!-- Modern Navbar -->
+  <%-include('../partials/nav') %>
+
+    <!-- Main Content -->
+    <div class="relative z-10 max-w-7xl mx-auto px-6 py-12">
+
+      <!-- Page Header -->
+      <div class="text-center mb-12 fade-in">
+        <h1 class="text-5xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-4">
+         My Bookings
+        </h1>
+        <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+       Discover amazing places to stay around the world. Each home is carefully selected for your perfect getaway.
+        </p>
+      </div>
+
+      <!-- Homes Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- Sample Home Card 1 -->
+
+       <% if (bookedHomes && bookedHomes.length > 0) { %>
+  <% bookedHomes.forEach(booking => { %>
+    <div class="card-hover bg-white rounded-3xl overflow-hidden shadow-xl fade-in" style="animation-delay: 0.1s;">
+      <div class="relative">
+        <img class="w-full h-64 object-cover" src="<%= booking.photo %>" alt="Home">
+        <div class="absolute bottom-4 left-4">
+          <span class="price-badge text-white px-3 py-1 rounded-full text-sm font-semibold">
+            ₹<%= booking.price %>/night
+          </span>
+        </div>
+      </div>
+      <div class="p-6">
+        <h3 class="text-xl font-bold text-gray-800 mb-2">
+          <%= booking.houseName || 'Untitled Home' %>
+        </h3>
+        <p class="text-gray-600 mb-4 flex items-center">
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          <%= booking.location %>
+        </p>
+ 
+
+        <form method="POST" action="/booking/delete/<%= booking._id %>">
+          <button class="btn-gradient text-white px-4 py-2 rounded-xl text-sm font-medium">
+            Remove
+          </button>
+        </form>
+      </div>
+    </div>
+  <% }) %>
+<% } else { %>
+  <div class="col-span-3 text-center text-gray-500 text-xl">No bookings found.</div>
+<% } %>
