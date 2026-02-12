@@ -18,7 +18,7 @@ const { default: mongoose } = require("mongoose")
 const multer = require('multer')
 const bcrypt = require('bcryptjs');
 
-const DB_path = "mongodb+srv://gondaliyabhautik419:9qy4ZTsoGQt4Mldx@cluster0.ucraaa3.mongodb.net/airbnb?retryWrites=true&w=majority&appName=Cluster0";
+const DB_path = process.env.MONGO_URI
 
 const multerOption = require('./middleware/img-upload')
 
