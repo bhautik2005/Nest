@@ -117,7 +117,7 @@ console.log("Full booking data with populated homeId:", JSON.stringify(fullBooki
         console.error("Error in postbooking:", error);
         res.status(500).send("Internal server error");
     }
-};
+}; 
 
  exports.postremovebooking = async (req, res, next) => {
     console.log('Form postremovebooking triggered');
