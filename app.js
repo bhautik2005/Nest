@@ -18,7 +18,7 @@ const { default: mongoose } = require("mongoose")
 const multer = require('multer')
 const bcrypt = require('bcryptjs');
 
-const DB_path = "mongodb+srv://gondaliyabhautik419:9qy4ZTsoGQt4Mldx@cluster0.ucraaa3.mongodb.net/airbnb?retryWrites=true&w=majority&appName=Cluster0";
+const DB_path = process.env.MONGO_URI
 
 const multerOption = require('./middleware/img-upload')
 
@@ -126,8 +126,12 @@ app.use((req, res, next) => {
   next();
 });
 
+<<<<<<< HEAD
 const port = process.env.PORT   ||3000;
  
+=======
+const port = process.env.PORT || 3000;
+>>>>>>> 645ab64cc161bd0ff22233fd2333749a7d2deb86
 
 mongoose.connect(DB_path).then(() => {
   console.log("Connected to MongoDB");
@@ -139,4 +143,7 @@ mongoose.connect(DB_path).then(() => {
 })
 
  
+<<<<<<< HEAD
  
+=======
+>>>>>>> 645ab64cc161bd0ff22233fd2333749a7d2deb86
