@@ -31,5 +31,8 @@ storeRouters.post('/favourite/delete/:homeId', gethome.postremoveFavourite);
 
 storeRouters.get('/rules/:homeId', gethome.getHomeRules);
 
+// profile page
+storeRouters.get('/profile', gethome.profile);
+
 
 module.exports = storeRouters

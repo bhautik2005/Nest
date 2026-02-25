@@ -247,6 +247,19 @@ exports.postremoveFavourite = async (req, res, next) => {
     res.redirect('/favourite');
 };
 
+// render user profile page – linked from navbar
+exports.profile = (req, res, next) => {
+    if (!req.session.isLoggedIn) {
+        return res.redirect('/login');
+    }
+    res.render('store/profile', {
+        currentPage: 'profile',
+        isLoggedIn: req.isLoggedIn,
+        user: req.session.user,
+        userType: req.session.userType,
+    });
+};
+
 exports.getHomeRules = [(req, res, next) => {
 
     if (!req.session.isLoggedIn) {
