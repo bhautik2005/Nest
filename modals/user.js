@@ -60,7 +60,7 @@ userSchema.pre('save', function(next) {
 });
 
 // Index for efficient queries
-userSchema.index({ email: 1 });
+// userSchema.index({ email: 1 });
 userSchema.index({ resetToken: 1 });
  
 
