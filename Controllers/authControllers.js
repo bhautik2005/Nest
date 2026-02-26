@@ -538,11 +538,14 @@ exports.postSignup = [
     }).then(() => {
       res.redirect('/login');
     }).catch(err => {
+      // log error for debugging (e.g. duplicate email / db issues)
+      console.error('Signup error:', err);
       return res.status(422).render("auth/signup", {
         pageTitle: "Signup",
         currentPage: "signup",
         isLoggedIn: false,
-        errors: [err.message],
+        // use same key the template expects so messages are shown
+        errorMessages: [err.message || 'An error occurred'],
         oldInput: { firstName, lastName, email, userType },
         user: {},
       });
