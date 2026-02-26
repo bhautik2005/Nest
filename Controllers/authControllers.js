@@ -439,17 +439,17 @@ exports.postLogout = (req, res, next) => {
   });
 }
 
-exports.getsingup = (req, res, next) => {
-  res.render('auth/singup', {
+exports.getSignup = (req, res, next) => {
+  res.render('auth/signup', {
     isLoggedIn: false,
-    currentPage: 'singup',
+    currentPage: 'signup',
     oldInput: {},
     user: {},
   })
 }
 
 
-exports.postsingup = [
+exports.postSignup = [
    check("firstName")
     .trim()
     .isLength({ min: 2 })
@@ -510,9 +510,9 @@ exports.postsingup = [
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
-      return res.status(422).render('auth/singup', {
+      return res.status(422).render('auth/signup', {
         isLoggedIn: false,
-        currentPage: 'singup',
+        currentPage: 'signup',
         errorMessages: errors.array().map(error => error.msg),
         oldInput: {
           firstName,
