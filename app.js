@@ -126,12 +126,9 @@ app.use((req, res, next) => {
   next();
 });
 
-<<<<<<< HEAD
-const port = process.env.PORT   ||3000;
- 
-=======
+
 const port = process.env.PORT || 3000;
->>>>>>> 645ab64cc161bd0ff22233fd2333749a7d2deb86
+ 
 
 mongoose.connect(DB_path).then(() => {
   console.log("Connected to MongoDB");
@@ -141,9 +138,4 @@ mongoose.connect(DB_path).then(() => {
 }).catch((err) => {
   console.log("Error connecting to MongoDB", err);
 })
-
  
-<<<<<<< HEAD
- 
-=======
->>>>>>> 645ab64cc161bd0ff22233fd2333749a7d2deb86
