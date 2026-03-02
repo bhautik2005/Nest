@@ -13,7 +13,8 @@ A full-stack web application built with Express.js, MongoDB, and EJS templating.
 - Node.js (v14 or higher)
 - MongoDB
 - npm or yarn
-
+## Img of project
+![img1](https://github.com/bhautik2005/Nest/blob/e17d42e4c5eb5f510b4ae2cb3f205eaddfd8ba17/airbnb_project_img/image.jpg)
 ## Installation
 
 1. Clone the repository:
