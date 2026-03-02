@@ -14,7 +14,10 @@ A full-stack web application built with Express.js, MongoDB, and EJS templating.
 - MongoDB
 - npm or yarn
 ## Img of project
-<img src="https://github.com/bhautik2005/Nest/raw/e17d42e4c5eb5f510b4ae2cb3f205eaddfd8ba17/airbnb_project_img/image.jpg" alt="Airbnb Project Image" width="400">
+ 
+| Front Page View | Search Results View |
+| :---: | :---: |
+| <img src="https://github.com/bhautik2005/Nest/raw/e17d42e4c5eb5f510b4ae2cb3f205eaddfd8ba17/airbnb_project_img/image.jpg" alt="Airbnb Project Image" width="400"> | <img src="https://github.com/bhautik2005/Nest/raw/e17d42e4c5eb5f510b4ae2cb3f205eaddfd8ba17/airbnb_project_img/image.jpg" alt="Airbnb Project Image" width="400"> |
 ## Installation
 
 1. Clone the repository:
