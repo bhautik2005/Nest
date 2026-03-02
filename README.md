@@ -18,7 +18,12 @@ A full-stack web application built with Express.js, MongoDB, and EJS templating.
 | authentication | forget and reset password using email |
 | :---: | :---: |
 | <img src="https://github.com/bhautik2005/Nest/raw/e17d42e4c5eb5f510b4ae2cb3f205eaddfd8ba17/airbnb_project_img/image.jpg" alt="Airbnb Project Image" width="400"> | <img src="https://github.com/bhautik2005/Nest/raw/e17d42e4c5eb5f510b4ae2cb3f205eaddfd8ba17/airbnb_project_img/image(2).jpg" alt="Airbnb Project Image" width="400"> |
- 
+
+ | Caption for Image 1 | Caption for Image 2 |
+| :---: | :---: |
+| <img src="https://github.com/bhautik2005/Nest/raw/e17d42e4c5eb5f510b4ae2cb3f205eaddfd8ba17/airbnb_project_img/image.jpg" alt="Img 1" width="100%"> | <img src="https://github.com/bhautik2005/Nest/raw/e17d42e4c5eb5f510b4ae2cb3f205eaddfd8ba17/airbnb_project_img/image.jpg" alt="Img 2" width="100%"> |
+| **Caption for Image 3** | **Caption for Image 4** |
+| <img src="https://github.com/bhautik2005/Nest/raw/e17d42e4c5eb5f510b4ae2cb3f205eaddfd8ba17/airbnb_project_img/image.jpg" alt="Img 3" width="100%"> | <img src="https://github.com/bhautik2005/Nest/raw/e17d42e4c5eb5f510b4ae2cb3f205eaddfd8ba17/airbnb_project_img/image.jpg" alt="Img 4" width="100%"> |
 ## Installation
 
 1. Clone the repository:
