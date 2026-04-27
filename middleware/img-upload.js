@@ -10,29 +10,57 @@ function randomString(lenth) {
   return result;
 }
 
-const fileFlter = (req,file,cd)=>{
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const cloudinary = require('cloudinary').v2;
+
+// Configure cloudinary only if the URL is provided (i.e. in production)
+if (process.env.CLOUDINARY_URL || process.env.CLOUDINARY_CLOUD_NAME) {
+  cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+  });
+}
+
+const fileFilter = (req, file, cb) => {
   if (
     file.mimetype === 'image/png' ||
     file.mimetype === 'image/jpg' ||
-    file.mimetype === 'image/jpeg'
+    file.mimetype === 'image/jpeg' ||
+    file.mimetype === 'image/webp'
   ) {
-    cd(null, true);
+    cb(null, true);
   } else {
-    cd(null, false);
+    cb(null, false);
   }
 }
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads/");
-  },
-  filename: (req, file, cb) => {
-    cb(null, randomString(10) + '-' + file.originalname);
-  }
-});
+let storage;
+
+if (process.env.CLOUDINARY_CLOUD_NAME) {
+  // Use Cloudinary in production
+  storage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+      folder: 'airbnb-clone',
+      allowed_formats: ['jpg', 'png', 'jpeg', 'webp']
+    }
+  });
+} else {
+  // Fallback to local storage for development
+  storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, "uploads/");
+    },
+    filename: (req, file, cb) => {
+      cb(null, randomString(10) + '-' + file.originalname);
+    }
+  });
+}
 
 const multerOption = {
-  storage,fileFlter
+  storage: storage,
+  fileFilter: fileFilter
 }
 
 
