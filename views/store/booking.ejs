@@ -229,38 +229,104 @@
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         <!-- Sample Home Card 1 -->
 
-       <% if (bookedHomes && bookedHomes.length > 0) { %>
-  <% bookedHomes.forEach(booking => { %>
+<% if (reservations && reservations.length > 0) { %>
+  <% reservations.forEach(reservation => { %>
+    <% const home = reservation.homeId; %>
+    
     <div class="card-hover bg-white rounded-3xl overflow-hidden shadow-xl fade-in" style="animation-delay: 0.1s;">
+      
+      <% if (home) { %>
       <div class="relative">
-        <img class="w-full h-64 object-cover" src="<%= booking.photo %>" alt="Home">
+        <% let imgPath = home.photos && home.photos.length > 0 ? home.photos[0] : home.photo; if (imgPath) { imgPath = imgPath.replace(/\\/g, '/'); if (!imgPath.startsWith('http') && !imgPath.startsWith('/')) imgPath = '/' + imgPath; } %>
+        <img class="w-full h-64 object-cover" src="<%= imgPath %>" alt="Home">
+        <div class="absolute top-4 right-4">
+          <span class="bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-md">Available</span>
+        </div>
         <div class="absolute bottom-4 left-4">
           <span class="price-badge text-white px-3 py-1 rounded-full text-sm font-semibold">
-            ₹<%= booking.price %>/night
+            $<%= home.price %>/night
           </span>
         </div>
       </div>
       <div class="p-6">
         <h3 class="text-xl font-bold text-gray-800 mb-2">
-          <%= booking.houseName || 'Untitled Home' %>
+          <%= home.houseName || 'Untitled Home' %>
         </h3>
-        <p class="text-gray-600 mb-4 flex items-center">
-          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-          </svg>
-          <%= booking.location %>
-        </p>
- 
+        
+        <div class="mb-4 text-sm text-gray-700 bg-gray-50 p-4 rounded-xl border border-gray-100">
+          <div class="flex justify-between mb-1">
+             <span class="text-gray-500">Check-in:</span>
+             <span class="font-medium"><%= new Date(reservation.checkIn).toLocaleDateString() %></span>
+          </div>
+          <div class="flex justify-between mb-1">
+             <span class="text-gray-500">Check-out:</span>
+             <span class="font-medium"><%= new Date(reservation.checkOut).toLocaleDateString() %></span>
+          </div>
+          <div class="flex justify-between mb-1">
+             <span class="text-gray-500">Guests:</span>
+             <span class="font-medium"><%= reservation.members %></span>
+          </div>
+          <% if (reservation.billingId) { %>
+          <div class="flex justify-between mb-1">
+             <span class="text-gray-500">Nights:</span>
+             <span class="font-medium"><%= reservation.billingId.nights %></span>
+          </div>
+          <div class="flex justify-between font-bold text-black mt-2 pt-2 border-t">
+             <span>Total Price:</span>
+             <span>$<%= reservation.billingId.totalAmount %></span>
+          </div>
+          <% } %>
+        </div>
 
-        <form method="POST" action="/booking/delete/<%= booking._id %>">
-          <button class="btn-gradient text-white px-4 py-2 rounded-xl text-sm font-medium">
-            Remove
-          </button>
-        </form>
+        <div class="flex gap-2">
+          <a href="/booking/invoice/<%= reservation._id %>" class="btn-gradient flex-1 text-center text-white px-4 py-3 rounded-xl text-sm font-medium">
+            Booking View
+          </a>
+          <% if (reservation.billingId) { %>
+          <a href="/api/billing/<%= reservation.billingId._id %>/download" target="_blank" class="bg-blue-600 hover:bg-blue-700 flex-1 text-center text-white px-4 py-3 rounded-xl text-sm font-medium flex justify-center items-center gap-1">
+             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+             Download Invoice
+          </a>
+          <% } %>
+        </div>
       </div>
+      <% } else { %>
+      <!-- Home was deleted fallback UI -->
+      <div class="relative bg-gray-200 h-64 flex items-center justify-center">
+        <div class="absolute top-4 right-4">
+          <span class="bg-red-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-md">Unavailable</span>
+        </div>
+        <span class="text-gray-500 font-medium">Home details no longer available</span>
+      </div>
+      <div class="p-6">
+        <h3 class="text-xl font-bold text-gray-400 mb-2">
+          Deleted Home
+        </h3>
+        
+        <div class="mb-4 text-sm text-gray-700 bg-gray-50 p-4 rounded-xl border border-gray-100 opacity-75">
+          <div class="flex justify-between mb-1">
+             <span class="text-gray-500">Check-in:</span>
+             <span class="font-medium"><%= new Date(reservation.checkIn).toLocaleDateString() %></span>
+          </div>
+          <div class="flex justify-between mb-1">
+             <span class="text-gray-500">Check-out:</span>
+             <span class="font-medium"><%= new Date(reservation.checkOut).toLocaleDateString() %></span>
+          </div>
+          <% if (reservation.billingId) { %>
+          <div class="flex justify-between font-bold text-black mt-2 pt-2 border-t">
+             <span>Total Price:</span>
+             <span>$<%= reservation.billingId.totalAmount %></span>
+          </div>
+          <% } %>
+        </div>
+
+        <div class="flex gap-2">
+          <button disabled class="bg-gray-300 flex-1 text-center text-white px-4 py-3 rounded-xl text-sm font-medium cursor-not-allowed">
+            No Invoice Available
+          </button>
+        </div>
+      </div>
+      <% } %>
     </div>
   <% }) %>
 <% } else { %>

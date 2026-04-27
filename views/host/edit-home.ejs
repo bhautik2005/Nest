@@ -263,6 +263,36 @@
           </label>
         </div>
         
+        <!-- Google Maps URL -->
+        <div class="input-group">
+          <input 
+            class="input-modern w-full p-4 rounded-xl text-lg font-medium placeholder-transparent" 
+            type="url" 
+            name="locationUrl" 
+            id="locationUrl"
+            placeholder="Google Maps URL"
+            value="<%= editing && home.locationUrl ? home.locationUrl : '' %>">
+          <label for="locationUrl" class="floating-label">
+            🗺️ Google Maps URL
+          </label>
+        </div>
+
+        <!-- Max Guests -->
+        <div class="input-group">
+          <input 
+            class="input-modern w-full p-4 rounded-xl text-lg font-medium placeholder-transparent" 
+            type="number" 
+            name="maxGuests" 
+            id="maxGuests"
+            min="1"
+            placeholder="Maximum Guest Capacity"
+            value="<%= editing && home.maxGuests ? home.maxGuests : 1 %>"
+            required>
+          <label for="maxGuests" class="floating-label">
+            👥 Maximum Guest Capacity
+          </label>
+        </div>
+        
         <!-- Photo Upload -->
         <div class="space-y-2">
           <label class="block text-sm font-semibold text-gray-700 mb-2">
@@ -272,8 +302,9 @@
             <input 
               class="input-modern" 
               type="file" 
-              name="photo" 
+              name="photos" 
               accept="image/*"
+              multiple
               <%= editing ? "" : "required" %>
           >
             <div class="pointer-events-none">
@@ -295,7 +326,20 @@
             value="<%= editing ? home.description : "" %>"
             required>
           <label for="description" class="floating-label">
-            📝 Description
+            📝 Description (Short)
+          </label>
+        </div>
+
+        <!-- Detailed Description -->
+        <div class="input-group">
+          <textarea 
+            class="input-modern w-full p-4 rounded-xl text-lg font-medium placeholder-transparent min-h-[120px]" 
+            name="detailedDescription" 
+            id="detailedDescription"
+            placeholder="Detailed Description"
+            required><%= editing && home.detailedDescription ? home.detailedDescription : "" %></textarea>
+          <label for="detailedDescription" class="floating-label" style="top: 25px;">
+            📖 Detailed Description
           </label>
         </div>
         
@@ -347,10 +391,13 @@
         if (e.target.files.length > 0) {
           fileUploadArea.style.borderColor = '#10b981';
           fileUploadArea.style.background = 'rgba(16, 185, 129, 0.1)';
+          
+          let fileText = e.target.files.length === 1 ? e.target.files[0].name : `${e.target.files.length} photos selected`;
+          
           fileUploadArea.querySelector('.pointer-events-none').innerHTML = `
             <div class="text-4xl mb-2">✅</div>
-            <div class="text-lg font-semibold text-green-700">Photo Selected</div>
-            <div class="text-sm text-green-600 mt-1">${e.target.files[0].name}</div>
+            <div class="text-lg font-semibold text-green-700">Photos Selected</div>
+            <div class="text-sm text-green-600 mt-1">${fileText}</div>
           `;
         }
       });

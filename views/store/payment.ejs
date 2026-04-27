@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Checkout - Airbnb Clone</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f7f7f9;
+        }
+
+        .checkout-container {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .tab-btn.active {
+            border-bottom: 2px solid #000;
+            font-weight: 600;
+            color: #000;
+        }
+        .tab-btn {
+            color: #717171;
+            padding-bottom: 8px;
+            transition: all 0.2s;
+        }
+
+        /* Fake Processing Loader */
+        #loader {
+            display: none;
+        }
+        .spinner {
+            border: 4px solid rgba(0,0,0,0.1);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border-left-color: #ff385c;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        .success-mark {
+            display: none;
+            color: #00a699;
+            font-size: 4rem;
+            animation: scaleUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes scaleUp { 0% { transform: scale(0); } 100% { transform: scale(1); } }
+        
+        .input-field {
+            border: 1px solid #b0b0b0;
+            border-radius: 8px;
+            padding: 12px;
+            width: 100%;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .input-field:focus {
+            border-color: #222;
+            border-width: 2px;
+            padding: 11px; /* adjust for border width */
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="bg-white border-b sticky top-0 z-50">
+        <%- include('../partials/nav') %>
+    </nav>
+
+    <div class="max-w-6xl mx-auto px-6 py-12 checkout-container">
+        <div class="flex items-center mb-8">
+            <a href="/home/<%= home._id %>" class="p-2 hover:bg-gray-100 rounded-full mr-4 transition">
+                <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="presentation" focusable="false" style="display: block; fill: none; height: 16px; width: 16px; stroke: currentcolor; stroke-width: 3; overflow: visible;"><g fill="none"><path d="m20 28-11.29289322-11.2928932c-.39052429-.3905243-.39052429-1.0236893 0-1.4142136l11.29289322-11.2928932"></path></g></svg>
+            </a>
+            <h1 class="text-3xl font-semibold">Confirm and pay</h1>
+        </div>
+
+        <div class="flex flex-col lg:flex-row gap-12">
+            <!-- Left Side: Payment Details -->
+            <div class="flex-1">
+                <h2 class="text-2xl font-medium mb-6">Pay with</h2>
+                
+                <!-- Payment Tabs -->
+                <div class="flex space-x-6 border-b mb-6">
+                    <button class="tab-btn active text-lg" onclick="switchTab('card')">Credit / Debit Card</button>
+                    <button class="tab-btn text-lg" onclick="switchTab('upi')">UPI</button>
+                </div>
+
+                <!-- Card Payment Form -->
+                <div id="card-tab">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="col-span-2">
+                            <input type="text" class="input-field" placeholder="Card number" value="4242 4242 4242 4242">
+                        </div>
+                        <div>
+                            <input type="text" class="input-field" placeholder="Expiration (MM/YY)" value="12/25">
+                        </div>
+                        <div>
+                            <input type="text" class="input-field" placeholder="CVV" value="123">
+                        </div>
+                        <div class="col-span-2">
+                            <input type="text" class="input-field" placeholder="Name on card" value="<%= user.firstName %>">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- UPI Payment Form -->
+                <div id="upi-tab" style="display: none;">
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm mb-2">Enter UPI ID</label>
+                        <input type="text" class="input-field" placeholder="example@okhdfcbank" value="<%= user.firstName.toLowerCase() %>@upi">
+                    </div>
+                    <p class="text-sm text-gray-500">A payment request will be sent to your UPI app.</p>
+                </div>
+
+                <hr class="my-8">
+
+                <!-- Cancellation policy -->
+                <div>
+                    <h3 class="text-xl font-medium mb-2">Cancellation policy</h3>
+                    <p class="text-gray-600 mb-2"><strong>Free cancellation for 48 hours.</strong> Cancel before check-in for a partial refund.</p>
+                    <p class="text-sm text-gray-500">Our policies are designed to be fair to both guests and hosts.</p>
+                </div>
+
+                <hr class="my-8">
+
+                <div class="text-sm text-gray-500 mb-6">
+                    By selecting the button below, I agree to the House Rules, Ground Rules for Guests, and Airbnb's Rebooking and Refund Policy.
+                </div>
+
+                <!-- Action Button -->
+                <button id="payBtn" onclick="processFakePayment()" class="w-full bg-[#ff385c] hover:bg-[#e00b36] text-white py-4 rounded-xl text-lg font-semibold transition flex justify-center items-center">
+                    Confirm and pay
+                </button>
+
+                <!-- Processing UI (Hidden initially) -->
+                <div id="loader" class="mt-8 flex flex-col items-center justify-center py-6 bg-white rounded-xl shadow-sm border">
+                    <div class="spinner mb-4"></div>
+                    <div class="success-mark mb-4">✓</div>
+                    <h3 id="loaderText" class="text-lg font-medium">Processing your payment...</h3>
+                    <p id="loaderSub" class="text-sm text-gray-500 mt-1">Please do not close this window</p>
+                </div>
+            </div>
+
+            <!-- Right Side: Order Summary -->
+            <div class="w-full lg:w-96">
+                <div class="bg-white p-6 rounded-2xl border sticky top-24 shadow-sm">
+                    <div class="flex gap-4 mb-6">
+                        <img src="<%= home.photo %>" class="w-28 h-24 object-cover rounded-xl" alt="<%= home.houseName %>">
+                        <div>
+                            <p class="text-sm text-gray-500">Entire home</p>
+                            <h3 class="font-medium text-gray-800 leading-snug"><%= home.houseName %></h3>
+                            <div class="text-sm mt-1">★ 4.98 (124 reviews)</div>
+                        </div>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <h3 class="text-xl font-medium mb-4">Price details</h3>
+                    
+                    <div class="flex justify-between mb-3 text-gray-700">
+                        <span>$<%= home.price %> x 1 night</span>
+                        <span>$<%= home.price %></span>
+                    </div>
+                    <div class="flex justify-between mb-3 text-gray-700">
+                        <span class="underline">Cleaning fee</span>
+                        <span>$20</span>
+                    </div>
+                    <div class="flex justify-between mb-3 text-gray-700">
+                        <span class="underline">Service fee</span>
+                        <span>$15</span>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <div class="flex justify-between font-semibold text-lg">
+                        <span>Total (USD)</span>
+                        <span>$<%= parseInt(home.price) + 20 + 15 %></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden Form to submit actual booking -->
+    <form id="bookingForm" action="/booking" method="POST" style="display: none;">
+        <input type="hidden" name="reservationId" value="<%= reservation._id %>">
+        <input type="hidden" name="paymentMethod" id="paymentMethodInput" value="Credit / Debit Card">
+    </form>
+
+    <script>
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            if(tab === 'card') {
+                document.getElementById('card-tab').style.display = 'block';
+                document.getElementById('upi-tab').style.display = 'none';
+                document.getElementById('paymentMethodInput').value = 'Credit / Debit Card';
+            } else {
+                document.getElementById('card-tab').style.display = 'none';
+                document.getElementById('upi-tab').style.display = 'block';
+                document.getElementById('paymentMethodInput').value = 'UPI';
+            }
+        }
+
+        function processFakePayment() {
+            // Hide pay button and show loader
+            const btn = document.getElementById('payBtn');
+            const loader = document.getElementById('loader');
+            const spinner = document.querySelector('.spinner');
+            const successMark = document.querySelector('.success-mark');
+            const loaderText = document.getElementById('loaderText');
+            const loaderSub = document.getElementById('loaderSub');
+            
+            btn.style.display = 'none';
+            loader.style.display = 'flex';
+            
+            // Step 1: Processing
+            setTimeout(() => {
+                // Step 2: Payment Success
+                spinner.style.display = 'none';
+                successMark.style.display = 'block';
+                loaderText.innerText = 'Payment Successful!';
+                loaderText.classList.add('text-green-600');
+                loaderSub.innerText = 'Confirming your booking...';
+                
+                // Step 3: Auto submit the booking form
+                setTimeout(() => {
+                    document.getElementById('bookingForm').submit();
+                }, 1500);
+                
+            }, 2500);
+        }
+    </script>
+</body>
+</html>

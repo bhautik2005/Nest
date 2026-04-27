@@ -13,17 +13,32 @@ const { hostRoutes } = require('./routes/hostRoutes')
 const rootDir = require('./utilis/pathUtil')
 const errorControllers = require('./Controllers/error')
 const authRoutes = require('./routes/authRoutes')
+const billingRouters = require('./routes/billingRoutes')
+const isAuth = require('./middleware/is-auth');
+const isHost = require('./middleware/is-host');
+const setUser = require('./middleware/set-user');
 const { Result } = require("postcss")
 const { default: mongoose } = require("mongoose")
 const multer = require('multer')
 const bcrypt = require('bcryptjs');
 
-const DB_path = "mongodb+srv://gondaliyabhautik419:9qy4ZTsoGQt4Mldx@cluster0.ucraaa3.mongodb.net/airbnb?retryWrites=true&w=majority&appName=Cluster0";
+const DB_path = process.env.MONGO_URI;
 
-const multerOption = require('./middleware/img-upload')
+if (!DB_path) {
+  console.error("❌ CRITICAL ERROR: MONGO_URI is not defined in environment variables!");
+  console.error("Please create a .env file or set MONGO_URI in your deployment platform.");
+  process.exit(1);
+}
 
+if (!process.env.SESSION_SECRET) {
+  console.warn("⚠️ WARNING: SESSION_SECRET is not defined. Using a default unsafe key.");
+}
 
-const app = express()
+const multerOption = require('./middleware/img-upload');
+
+const app = express();
+// Trust proxy is required if deployed behind a reverse proxy (like Render, Heroku, Vercel, Nginx)
+app.set('trust proxy', 1);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
@@ -38,31 +53,23 @@ const store = new mongoDBStore({
 app.use(express.urlencoded({ extended: true }));
 app.use(express.urlencoded())
 app.use(express.json());
-app.use(multer(multerOption).single('photo'))
+app.use(multer(multerOption).any())
 app.use(express.static(path.join(rootDir, 'public')))
-app.use("/uploads",express.static(path.join(rootDir,'uploads')))
-app.use("/host/uploads",express.static(path.join(rootDir,'uploads')))
-app.use("/home/uploads",express.static(path.join(rootDir,'uploads')))
+app.use("/uploads", express.static(path.join(rootDir, 'uploads')))
+app.use("/host/uploads", express.static(path.join(rootDir, 'uploads')))
+app.use("/home/uploads", express.static(path.join(rootDir, 'uploads')))
 
 
 
 
 // Session configuration
 app.use(session({
-  secret: process.env.SESSION_SECRET,
+  secret: process.env.SESSION_SECRET || 'your-secret-key-here-change-this-in-production',
   resave: false,
   saveUninitialized: false,
-  cookie: { secure: false } // Set to true in production with HTTPS
-}));
-
-
-// Session configuration with hardcoded secret (for development only)
-app.use(session({
-  secret: 'your-secret-key-here-change-this-in-production',
-  resave: false,
-  saveUninitialized: false,
+  store: store,
   cookie: { 
-    secure: false, // Set to true in production with HTTPS
+    secure: process.env.NODE_ENV === 'production', // Set to true in production with HTTPS
     maxAge: 24 * 60 * 60 * 1000 // 24 hours
   }
 }));
@@ -70,35 +77,16 @@ app.use(session({
 // Flash messages
 app.use(flash());
 
-app.use(session({
-  secret: 'bhautik',
-  resave: false,
-  saveUninitialized: true,
-  store: store,
-}))
+// Populate user and set locals
+app.use(setUser);
 
- 
-
-app.use((req, res, next) => {
-  // console.log("cookie chek midderwere",req.get('Cookie'))
-  req.isLoggedIn = req.session.isLoggedIn
-  next();
-})
-
-
-
-
+// Routes
 app.use(authRoutes)
 app.use(storeRouters)
-app.use('/host', (req, res, next) => {
-  if (req.isLoggedIn) {
-    next()
-  } else {
-    res.redirect('/login')
-  }
-});
-app.use('/host', hostRoutes)
+app.use(billingRouters)
 
+// Protected host routes (Must be authenticated AND have host role)
+app.use('/host', isAuth, isHost, hostRoutes)
 
 
 
@@ -125,10 +113,7 @@ app.use((req, res, next) => {
   console.log(`Incoming Request: ${req.method} ${req.url}`);
   next();
 });
-
-const port = process.env.PORT   ||3000;
- 
-
+const port = process.env.PORT || 3000
 mongoose.connect(DB_path).then(() => {
   console.log("Connected to MongoDB");
   app.listen(port, () => {
@@ -138,5 +123,4 @@ mongoose.connect(DB_path).then(() => {
   console.log("Error connecting to MongoDB", err);
 })
 
- 
- 
+

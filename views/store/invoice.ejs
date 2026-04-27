@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice Details - Airbnb Clone</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f7f7f9; }
+        .invoice-card { background: #fff; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.05); }
+        .btn-download { background: #ff385c; color: #fff; transition: background 0.3s; }
+        .btn-download:hover { background: #e00b36; }
+    </style>
+</head>
+<body>
+    <nav class="bg-white border-b sticky top-0 z-50">
+        <%- include('../partials/nav') %>
+    </nav>
+
+    <div class="max-w-4xl mx-auto px-6 py-12">
+        <div class="flex items-center mb-8">
+            <a href="/booking" class="p-2 hover:bg-gray-100 rounded-full mr-4 transition">
+                <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="presentation" focusable="false" style="display: block; fill: none; height: 16px; width: 16px; stroke: currentcolor; stroke-width: 3; overflow: visible;"><g fill="none"><path d="m20 28-11.29289322-11.2928932c-.39052429-.3905243-.39052429-1.0236893 0-1.4142136l11.29289322-11.2928932"></path></g></svg>
+            </a>
+            <h1 class="text-3xl font-bold">Booking Details & Invoice</h1>
+        </div>
+
+        <div class="invoice-card p-8 md:p-12">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 border-b pb-8">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-900">Invoice</h2>
+                    <p class="text-gray-500 mt-1">Invoice ID: <%= billing.invoiceId %></p>
+                    <p class="text-gray-500">Date Issued: <%= new Date(billing.createdAt).toLocaleDateString() %></p>
+                    <span class="inline-block mt-3 px-3 py-1 bg-green-100 text-green-700 text-sm font-semibold rounded-full">Paid</span>
+                </div>
+                <div class="mt-6 md:mt-0 text-left md:text-right">
+                    <a href="/api/billing/<%= billing._id %>/download" target="_blank" class="btn-download px-6 py-3 rounded-xl font-medium inline-flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                        Download PDF Invoice
+                    </a>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-10 mb-10">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">Host Details</h3>
+                    <% if (host) { %>
+                    <p class="text-gray-700"><span class="font-medium">Name:</span> <%= host.firstName %> <%= host.lastName %></p>
+                    <p class="text-gray-700 mt-2"><span class="font-medium">Email:</span> <%= host.email %></p>
+                    <% } else { %>
+                    <p class="text-gray-700 italic">Host details not available</p>
+                    <% } %>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">Property Information</h3>
+                    <div class="flex items-center gap-4 mb-4">
+<% let imgPath = home.imgUrl || (home.photos && home.photos.length > 0 ? home.photos[0] : home.photo); if (imgPath) { imgPath = imgPath.replace(/\\/g, '/'); if (!imgPath.startsWith('http') && !imgPath.startsWith('/')) imgPath = '/' + imgPath; } %>
+                        <img src="<%= imgPath %>" class="w-20 h-20 rounded-lg object-cover shadow-sm" alt="Home">
+                        <div>
+                            <p class="font-bold text-gray-800 text-lg"><%= home.houseName %></p>
+                            <p class="text-sm text-gray-500 flex items-center mt-1">
+                                <svg class="w-4 h-4 mr-1 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                <%= home.location %>
+                            </p>
+                        </div>
+                    </div>
+                    <% if (home.location) { %>
+                    <div class="rounded-xl overflow-hidden border border-gray-200 mt-3 shadow-sm h-48 w-full">
+                        <iframe width="100%" height="100%" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://maps.google.com/maps?q=<%= encodeURIComponent(home.location) %>&t=&z=13&ie=UTF8&iwloc=&output=embed"></iframe>
+                    </div>
+                    <% } %>
+                </div>
+            </div>
+
+            <div class="bg-gray-50 rounded-2xl p-6 mb-8 border border-gray-100">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">Trip Details</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                    <div>
+                        <p class="text-sm text-gray-500 mb-1">Check-in</p>
+                        <p class="font-medium text-gray-900"><%= new Date(reservation.checkIn).toLocaleDateString() %></p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500 mb-1">Check-out</p>
+                        <p class="font-medium text-gray-900"><%= new Date(reservation.checkOut).toLocaleDateString() %></p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500 mb-1">Guests</p>
+                        <p class="font-medium text-gray-900"><%= reservation.members %></p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500 mb-1">Total Nights</p>
+                        <p class="font-medium text-gray-900"><%= billing.nights %></p>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">Payment Breakdown</h3>
+                <div class="space-y-3">
+                    <div class="flex justify-between text-gray-700">
+                        <span>$<%= billing.pricePerNight %> x <%= billing.nights %> nights</span>
+                        <span>$<%= billing.pricePerNight * billing.nights %></span>
+                    </div>
+                    <div class="flex justify-between text-gray-700">
+                        <span>Taxes & Fees</span>
+                        <span>$<%= billing.taxes %></span>
+                    </div>
+                    <div class="flex justify-between font-bold text-xl text-gray-900 mt-4 pt-4 border-t">
+                        <span>Total Paid</span>
+                        <span>$<%= billing.totalAmount %></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -8,10 +8,10 @@ const bookingSchema = new mongoose.Schema({
   },
    home: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Home'
     ,require :true 
-    }]
+    }],
+   billing: { type: mongoose.Schema.Types.ObjectId, ref: 'Billing' },
+   totalPrice: { type: Number },
+   status: { type: String, enum: ['pending', 'confirmed', 'cancelled'], default: 'pending' }
 });
-
- 
-
 
 module.exports = mongoose.model('Booking', bookingSchema);

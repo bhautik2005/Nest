@@ -20,6 +20,14 @@
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       animation: pulse-price 2s ease-in-out infinite;
     }
+    
+    .scrollbar-hide::-webkit-scrollbar {
+      display: none;
+    }
+    .scrollbar-hide {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
   </style>
 </head>
 
@@ -39,12 +47,30 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
       <% registerHouse.forEach(home => { %>
         <div class="card-hover bg-white rounded-3xl overflow-hidden shadow-xl fade-in" style="animation-delay: 0.1s;">
-          <div class="relative">
-            <img class="w-full h-64 object-cover" src="<%= home.photo %>" alt="Modern Villa">
+          <div class="relative group overflow-hidden">
+            <% if (home.photos && home.photos.length > 1) { %>
+              <div id="slider-<%= home._id %>" class="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide h-64 w-full">
+                <% home.photos.forEach(photo => { 
+                  let pPath = photo ? photo.replace(/\\/g, '/') : '';
+                  if (pPath && !pPath.startsWith('http') && !pPath.startsWith('/')) pPath = '/' + pPath;
+                %>
+                  <img class="w-full h-full object-cover flex-shrink-0 snap-center" src="<%= pPath %>" alt="<%= home.houseName %>">
+                <% }) %>
+              </div>
+              <button onclick="document.getElementById('slider-<%= home._id %>').scrollBy({left: -300, behavior: 'smooth'})" class="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black/50 text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-black/70 transition opacity-0 group-hover:opacity-100 z-10">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+              </button>
+              <button onclick="document.getElementById('slider-<%= home._id %>').scrollBy({left: 300, behavior: 'smooth'})" class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black/50 text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-black/70 transition opacity-0 group-hover:opacity-100 z-10">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+              </button>
+            <% } else { %>
+<% let hImg = home.photos && home.photos.length > 0 ? home.photos[0] : home.photo; if (hImg) { hImg = hImg.replace(/\\/g, '/'); if (!hImg.startsWith('http') && !hImg.startsWith('/')) hImg = '/' + hImg; } %>
+              <img class="w-full h-64 object-cover" src="<%= hImg %>" alt="<%= home.houseName %>">
+            <% } %>
             <%- include('../partials/favourite', { home: home }) %>
             <div class="absolute bottom-4 left-4">
               <span class="price-badge text-white px-3 py-1 rounded-full text-sm font-semibold">
-                ₹<%= home.price %>/night
+                $<%= home.price %>/night
               </span>
             </div>
           </div>
@@ -61,7 +87,7 @@
               </svg>
               <%= home.location %>
             </p>
-            <div class="flex items-center justify-between">
+            <div class="flex items-center justify-between mt-2">
               <div class="flex items-center space-x-1">
                 <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
                   <path

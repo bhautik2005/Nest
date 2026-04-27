@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Details - Airbnb Clone</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f7f7f9;
+        }
+
+        .input-field {
+            border: 1px solid #b0b0b0;
+            border-radius: 8px;
+            padding: 12px;
+            width: 100%;
+            outline: none;
+            transition: border-color 0.2s;
+            margin-top: 5px;
+        }
+
+        .input-field:focus {
+            border-color: #222;
+            border-width: 2px;
+            padding: 11px;
+        }
+
+        .loader {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #ff385c;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="bg-white border-b sticky top-0 z-50">
+        <%- include('../partials/nav') %>
+    </nav>
+
+    <div class="max-w-4xl mx-auto px-6 py-12">
+        <div class="flex items-center mb-8">
+            <a href="/home/<%= home._id %>" class="p-2 hover:bg-gray-100 rounded-full mr-4 transition">
+                <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="presentation"
+                    focusable="false"
+                    style="display: block; fill: none; height: 16px; width: 16px; stroke: currentcolor; stroke-width: 3; overflow: visible;">
+                    <g fill="none">
+                        <path
+                            d="m20 28-11.29289322-11.2928932c-.39052429-.3905243-.39052429-1.0236893 0-1.4142136l11.29289322-11.2928932">
+                        </path>
+                    </g>
+                </svg>
+            </a>
+            <h1 class="text-3xl font-semibold">Request to book</h1>
+        </div>
+
+        <div class="flex flex-col lg:flex-row gap-12">
+            <div class="flex-1">
+                <h2 class="text-2xl font-medium mb-6">Your trip details</h2>
+
+                <form id="bookingForm" action="/booking/details" method="POST">
+                    <input type="hidden" id="homeId" name="homeId" value="<%= home._id %>">
+                    <input type="hidden" id="billingId" name="billingId" value="">
+
+                    <div class="mb-6">
+                        <label class="block text-gray-800 font-medium">Check-in Date</label>
+                        <input type="date" id="checkIn" name="checkIn" required class="input-field"
+                            min="<%= new Date().toISOString().split('T')[0] %>">
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="block text-gray-800 font-medium">Check-out Date</label>
+                        <input type="date" id="checkOut" name="checkOut" required class="input-field">
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="block text-gray-800 font-medium">Number of Guests</label>
+                        <input type="number" id="members" name="members" class="input-field" required min="1"
+                            max="<%= home.maxGuests || 1 %>" value="1">
+                        <p class="text-sm text-gray-500 mt-1">Maximum <%= home.maxGuests || 1 %> guests allowed.</p>
+                    </div>
+
+                    <hr class="my-8">
+
+                    <div id="billingActions" class="hidden space-y-4">
+                        <button type="button" id="generateBillBtn"
+                            class="w-full border-2 border-black hover:bg-gray-100 text-black py-4 rounded-xl text-lg font-semibold transition flex items-center justify-center">
+                            Generate Bill
+                        </button>
+
+                        <div id="invoiceActions" class="hidden space-y-4">
+                            <button type="submit" id="continuePaymentBtn"
+                                class="w-full bg-[#ff385c] hover:bg-[#e00b36] text-white py-4 rounded-xl text-lg font-semibold transition">
+                                Continue to Payment
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="w-full lg:w-96">
+                <div class="bg-white p-6 rounded-2xl border shadow-sm sticky top-24">
+                    <div class="flex gap-4 mb-6">
+                        <% let imgPath=home.photos && home.photos.length> 0 ? home.photos[0] : home.photo; if (imgPath)
+                            { imgPath = imgPath.replace(/\\/g, '/'); if (!imgPath.startsWith('http') &&
+                            !imgPath.startsWith('/')) imgPath = '/' + imgPath; } %>
+                            <img src="<%= imgPath %>" class="w-28 h-24 object-cover rounded-xl"
+                                alt="<%= home.houseName %>">
+                            <div>
+                                <p class="text-sm text-gray-500">Entire home</p>
+                                <h3 class="font-medium text-gray-800 leading-snug">
+                                    <%= home.houseName %>
+                                </h3>
+                            </div>
+                    </div>
+                    <hr class="my-4">
+
+                    <h3 class="text-xl font-semibold mb-4">Price details</h3>
+
+                    <div id="priceDetailsPlaceholder" class="text-gray-500 text-center py-4">
+                        Select dates to see price breakdown
+                    </div>
+
+                    <div id="priceDetailsContainer" class="hidden">
+                        <div class="flex justify-between mb-2">
+                            <span>$<%= home.price %> x <span id="summaryNights">0</span> nights</span>
+                            <span>$<span id="summaryBaseAmount">0</span></span>
+                        </div>
+                        <div class="flex justify-between mb-2">
+                            <span>Taxes & Fees</span>
+                            <span>$<span id="summaryTaxes">0</span></span>
+                        </div>
+                        <hr class="my-4">
+                        <div class="flex justify-between font-semibold text-lg">
+                            <span>Total Amount</span>
+                            <span>$<span id="summaryTotal">0</span></span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const checkInInput = document.getElementById('checkIn');
+        const checkOutInput = document.getElementById('checkOut');
+        const membersInput = document.getElementById('members');
+        const homeId = document.getElementById('homeId').value;
+
+        const priceDetailsPlaceholder = document.getElementById('priceDetailsPlaceholder');
+        const priceDetailsContainer = document.getElementById('priceDetailsContainer');
+        const billingActions = document.getElementById('billingActions');
+        const generateBillBtn = document.getElementById('generateBillBtn');
+        const invoiceActions = document.getElementById('invoiceActions');
+        const billingIdInput = document.getElementById('billingId');
+
+        let currentCalculation = null;
+
+        checkInInput.addEventListener('change', () => {
+            if (checkInInput.value) {
+                const checkInDate = new Date(checkInInput.value);
+                checkInDate.setDate(checkInDate.getDate() + 1);
+                checkOutInput.min = checkInDate.toISOString().split('T')[0];
+
+                if (checkOutInput.value && new Date(checkOutInput.value) <= new Date(checkInInput.value)) {
+                    checkOutInput.value = checkOutInput.min;
+                }
+            }
+            calculatePrice();
+        });
+
+        checkOutInput.addEventListener('change', calculatePrice);
+        membersInput.addEventListener('input', calculatePrice);
+
+        async function calculatePrice() {
+            const checkIn = checkInInput.value;
+            const checkOut = checkOutInput.value;
+            const guests = membersInput.value;
+
+            billingActions.classList.add('hidden');
+            invoiceActions.classList.add('hidden');
+            generateBillBtn.classList.remove('hidden');
+            billingIdInput.value = '';
+
+            if (!checkIn || !checkOut || !guests) {
+                priceDetailsPlaceholder.innerHTML = 'Select dates to see price breakdown';
+                priceDetailsPlaceholder.classList.remove('hidden');
+                priceDetailsContainer.classList.add('hidden');
+                return;
+            }
+
+            if (new Date(checkOut) <= new Date(checkIn)) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/billing/calculate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ homeId, checkInDate: checkIn, checkOutDate: checkOut, guests })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    if (data.status === 'Not Available') {
+                        priceDetailsPlaceholder.innerHTML = '<span class="text-red-500 font-semibold">These dates are not available. Please select different dates.</span>';
+                        priceDetailsPlaceholder.classList.remove('hidden');
+                        priceDetailsContainer.classList.add('hidden');
+                        return;
+                    }
+                    
+                    currentCalculation = data;
+
+                    document.getElementById('summaryNights').innerText = data.nights;
+                    document.getElementById('summaryBaseAmount').innerText = data.baseAmount;
+                    document.getElementById('summaryTaxes').innerText = data.taxes;
+                    document.getElementById('summaryTotal').innerText = data.totalAmount;
+
+                    // Bonus: Pre-booking label
+                    const checkInDate = new Date(checkIn);
+                    const today = new Date();
+                    const daysInAdvance = (checkInDate - today) / (1000 * 60 * 60 * 24);
+                    
+                    let preBookingHtml = '';
+                    if (daysInAdvance > 30) {
+                        preBookingHtml = '<div class="text-center mb-3"><span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded border border-blue-400">Pre-Booking Available</span></div>';
+                    }
+
+                    // Update Placeholder to hide it and show container
+                    priceDetailsPlaceholder.classList.add('hidden');
+                    
+                    const priceDetailsContainerEl = document.getElementById('priceDetailsContainer');
+                    // Inject pre-booking html inside container if it's not already there
+                    if (!document.getElementById('preBookingBadge')) {
+                        const div = document.createElement('div');
+                        div.id = 'preBookingBadge';
+                        priceDetailsContainerEl.prepend(div);
+                    }
+                    document.getElementById('preBookingBadge').innerHTML = preBookingHtml;
+                    
+                    priceDetailsContainer.classList.remove('hidden');
+                    billingActions.classList.remove('hidden');
+                }
+            } catch (err) {
+                console.error("Error calculating price", err);
+            }
+        }
+
+        generateBillBtn.addEventListener('click', async () => {
+            if (!currentCalculation) return;
+
+            const originalText = generateBillBtn.innerHTML;
+            generateBillBtn.innerHTML = '<span class="loader mr-2"></span> Generating...';
+            generateBillBtn.disabled = true;
+
+            try {
+                const payload = {
+                    homeId,
+                    checkInDate: checkInInput.value,
+                    checkOutDate: checkOutInput.value,
+                    guests: membersInput.value,
+                    ...currentCalculation
+                };
+
+                const response = await fetch('/api/billing/create', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    billingIdInput.value = data.billingId;
+
+                    generateBillBtn.classList.add('hidden');
+                    invoiceActions.classList.remove('hidden');
+                } else {
+                    alert('Failed to generate bill');
+                    generateBillBtn.innerHTML = originalText;
+                    generateBillBtn.disabled = false;
+                }
+            } catch (err) {
+                console.error("Error generating bill", err);
+                alert('Error generating bill');
+                generateBillBtn.innerHTML = originalText;
+                generateBillBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+
+</html>

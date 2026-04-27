@@ -39,22 +39,31 @@ exports.getEditHome = (req, res, next) => {
 };
 
 exports.postaddhome = (req, res, next) => {
-  const { houseName, price, location, description } = req.body;
+  const { houseName, price, location, description, locationUrl, maxGuests, detailedDescription } = req.body;
 
-  if (!req.file) {
+  let photos = [];
+  if (req.files && req.files.length > 0) {
+    photos = req.files.map(file => file.path);
+  }
+
+  if (photos.length === 0) {
     return res.status(422).send("img is can't provide");
   }
 
-  const photo = req.file.path;
-  const userId = req.session.user._id; // Get user ID from session
+  const photo = photos[0];
+  const userId = req.session.user._id;
 
   const home = new Home({
     houseName,
     price,
     location,
+    locationUrl,
     photo,
+    photos,
     description,
-    userId, // Store userId
+    detailedDescription,
+    maxGuests: maxGuests || 1,
+    userId,
   });
 
   home.save()
@@ -71,7 +80,7 @@ exports.postaddhome = (req, res, next) => {
 
 exports.postEditHome = (req, res, next) => {
  
-    const { id, houseName, price, location, photo, description } = req.body
+    const { id, houseName, price, location, description, locationUrl, maxGuests, detailedDescription } = req.body
     Home.findById(id).then(home => {
         if (!home) {
             console.log('Home not found');
@@ -80,17 +89,24 @@ exports.postEditHome = (req, res, next) => {
         home.houseName = houseName;
         home.price = price;
         home.location = location;
+        home.locationUrl = locationUrl;
         home.description = description;
+        home.detailedDescription = detailedDescription;
+        home.maxGuests = maxGuests || 1;
          
-        if (req.file) {
-             if (home.photo && typeof home.photo === 'string') {
-            fs.unlink(home.photo, (err) => {
-                if (err) {
-                    console.log("error while deleting file", err);
-                }
-            });
-        }
-        home.photo = req.file.path;
+        if (req.files && req.files.length > 0) {
+            const newPhotos = req.files.map(file => file.path);
+            
+            if (home.photos && home.photos.length > 0) {
+                home.photos.forEach(p => {
+                    fs.unlink(p, err => { if (err) console.log("error while deleting file", err); });
+                });
+            } else if (home.photo) {
+                fs.unlink(home.photo, err => { if (err) console.log("error while deleting file", err); });
+            }
+            
+            home.photos = newPhotos;
+            home.photo = newPhotos[0];
         }
 
 
