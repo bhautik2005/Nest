@@ -108,45 +108,45 @@
 
         <!-- Brand Logo -->
         <div class="slide-in">
-          <a href="/" class="brand-logo flex items-center space-x-2 nav-link px-4 py-2 rounded-xl">
-            <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+          <a href="/" class="flex items-center space-x-2 nav-link px-4 py-2 rounded-xl">
+            <svg class="w-8 h-8 text-teal-800" fill="currentColor" viewBox="0 0 24 24">
               <path
                 d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
             </svg>
-            <span>NEST</span>
+            <span class="text-2xl font-bold text-purple-600 tracking-wide">NEST</span>
           </a>
         </div>
 
         <!-- Center Navigation Links -->
         <% if(isLoggedIn){ %>
-          <div class="hidden md:flex items-center space-x-2 slide-in" style="animation-delay: 0.1s;">
+          <div class="hidden lg:flex items-center space-x-2 slide-in" style="animation-delay: 0.1s;">
 
             <% if(user && user.userType==="guest" ){%>
               <a href="/homelist" class="nav-link
           <%= currentPage === 'homelist' ? 'btn-gradient  text-white' : '  hover:text-purple-600' %>
-          text-gray-700 px-4 py-2 rounded-xl font-medium">
-                🏠 Home List
+          text-gray-700 px-4 py-2 rounded-xl font-medium flex items-center gap-2">
+                <span>🏡</span> Home List
               </a>
               <a href="/booking" class="nav-link
           <%= currentPage === 'booking' ? 'btn-gradient  text-white' : '  hover:text-purple-600' %>
-          text-gray-700 px-4 py-2 rounded-xl font-medium">
-                📅 Booking
+          text-gray-700 px-4 py-2 rounded-xl font-medium flex items-center gap-2">
+                <span>🗓️</span> Booking
               </a>
               <a href="/favourite" class="nav-link
           <%= currentPage === 'favourite' ? 'btn-gradient  text-white' : '  hover:text-purple-600' %>
-          text-gray-700 px-4 py-2 rounded-xl font-medium">
-                ❤️ Favourite
+          text-gray-700 px-4 py-2 rounded-xl font-medium flex items-center gap-2">
+                <span>💖</span> Favourite
               </a>
               <%}else{%>
                 <a href="/host/add-home" class="nav-link
           <%= currentPage === 'homeadd' ? 'btn-gradient  text-white' : '  hover:text-purple-600' %>
-          text-gray-700 px-4 py-2 rounded-xl font-medium">
-                  ➕ Add Home
+          text-gray-700 px-4 py-2 rounded-xl font-medium flex items-center gap-2">
+                  <span>➕</span> Add Home
                 </a>
                 <a href="/host/host-home" class="nav-link
           <%= currentPage === 'host-home' ? 'btn-gradient  text-white' : '  hover:text-purple-600' %>
-          text-gray-700 px-4 py-2 rounded-xl font-medium">
-                  🏡 Host Home
+          text-gray-700 px-4 py-2 rounded-xl font-medium flex items-center gap-2">
+                  <span>🏡</span> Host Home
                 </a>
                 <%}%>
           </div>
@@ -218,6 +218,37 @@
 
       <!-- Scrollable Body (panel scroll only) -->
       <div class="flex-1 overflow-y-auto p-6 space-y-6">
+
+        <!-- Mobile Navigation (Hidden on Desktop) -->
+        <div class="space-y-2 lg:hidden block">
+          <p class="text-xs font-medium text-purple-600 uppercase tracking-wide">Menu</p>
+          <div class="grid gap-2">
+            <% if(user && user.userType==="guest" ){%>
+            <a href="/homelist" class="flex items-center space-x-3 p-3 hover:bg-purple-50 rounded-xl transition-all duration-200">
+              <span class="text-xl">🏡</span>
+              <span class="font-medium text-gray-800">Home List</span>
+            </a>
+            <a href="/booking" class="flex items-center space-x-3 p-3 hover:bg-purple-50 rounded-xl transition-all duration-200">
+              <span class="text-xl">🗓️</span>
+              <span class="font-medium text-gray-800">Booking</span>
+            </a>
+            <a href="/favourite" class="flex items-center space-x-3 p-3 hover:bg-purple-50 rounded-xl transition-all duration-200">
+              <span class="text-xl">💖</span>
+              <span class="font-medium text-gray-800">Favourite</span>
+            </a>
+            <%}else{%>
+            <a href="/host/add-home" class="flex items-center space-x-3 p-3 hover:bg-purple-50 rounded-xl transition-all duration-200">
+              <span class="text-xl">➕</span>
+              <span class="font-medium text-gray-800">Add Home</span>
+            </a>
+            <a href="/host/host-home" class="flex items-center space-x-3 p-3 hover:bg-purple-50 rounded-xl transition-all duration-200">
+              <span class="text-xl">🏡</span>
+              <span class="font-medium text-gray-800">Host Home</span>
+            </a>
+            <%}%>
+          </div>
+        </div>
+
         <!-- Profile summary -->
         <div class="space-y-2">
           <p class="text-xs font-medium text-purple-600 uppercase tracking-wide">Account</p>
