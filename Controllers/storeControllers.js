@@ -1,12 +1,12 @@
 const session = require("express-session");
 const Home = require("../modals/home");
- 
+
 const User = require("../modals/user")
 const Booking = require('../modals/booking');
 const mongoose = require('mongoose');
 const Reservation = require('../modals/reservation');
 const Billing = require('../modals/billing');
-const { sendGuestConfirmationEmail, sendHostAlertEmail } = require('../utilis/emailUtil');
+const { sendGuestConfirmationEmail, sendHostAlertEmail } = require('../utils/email');
 
 
 
@@ -23,27 +23,27 @@ const { sendGuestConfirmationEmail, sendHostAlertEmail } = require('../utilis/em
 // };
 
 exports.gethome = async (req, res, next) => {
-  try {
-    const registerHouse = await Home.find();
-    
-    res.render('store/home', {
-      registerHouse,
-      currentPage: 'home',
-      isLoggedIn: req.isLoggedIn,
-      user: req.session.user,
-      userType: req.session.userType,
-    });
-  } catch (err) {
-    console.error("Error fetching homes:", err);
-    res.status(500).send("Database error");
-  }
+    try {
+        const registerHouse = await Home.find();
+
+        res.render('store/home', {
+            registerHouse,
+            currentPage: 'home',
+            isLoggedIn: req.isLoggedIn,
+            user: req.session.user,
+            userType: req.session.userType,
+        });
+    } catch (err) {
+        console.error("Error fetching homes:", err);
+        res.status(500).send("Database error");
+    }
 };
 
 
 exports.booking = async (req, res, next) => {
     try {
         const userId = req.session.user ? req.session.user._id : null;
- 
+
         let reservations = [];
 
         if (userId) {
@@ -51,7 +51,7 @@ exports.booking = async (req, res, next) => {
             const validHomeIds = userBooking ? userBooking.home.map(h => h.toString()) : [];
 
             const rawReservations = await Reservation.find({ userId: userId, status: 'Paid' }).populate('homeId').populate('billingId');
-            
+
             const currentDate = new Date();
             currentDate.setHours(0, 0, 0, 0);
 
@@ -69,10 +69,10 @@ exports.booking = async (req, res, next) => {
                     } else {
                         // Found a matching booking in the schema, consume it so duplicates match exactly
                         validHomeIds.splice(idx, 1);
-                        
+
                         const checkOutDate = new Date(resv.checkOut);
                         checkOutDate.setHours(0, 0, 0, 0);
-                        
+
                         if (checkOutDate < currentDate) {
                             shouldDelete = true; // Checkout date has expired
                         }
@@ -82,12 +82,12 @@ exports.booking = async (req, res, next) => {
                 if (shouldDelete) {
                     // Delete the Reservation
                     await Reservation.findByIdAndDelete(resv._id);
-                    
+
                     // Delete the Billing record if it exists
                     if (resv.billingId) {
                         await Billing.findByIdAndDelete(resv.billingId._id || resv.billingId);
                     }
-                    
+
                     // Remove from User's Booking list
                     if (resv.homeId) {
                         const userBooking = await Booking.findOne({ userId });
@@ -123,9 +123,9 @@ exports.getBookingDetails = async (req, res, next) => {
     try {
         const homeId = req.params.homeId;
         const home = await Home.findById(homeId);
-        
+
         if (!home) return res.redirect('/');
-        
+
         res.render('store/booking-details', {
             home: home,
             currentPage: 'booking',
@@ -169,11 +169,11 @@ exports.getPayment = async (req, res, next) => {
     try {
         const reservationId = req.params.reservationId;
         const reservation = await Reservation.findById(reservationId).populate('homeId');
-        
+
         if (!reservation) {
             return res.redirect('/');
         }
-        
+
         res.render('store/payment', {
             reservation: reservation,
             home: reservation.homeId,
@@ -188,14 +188,14 @@ exports.getPayment = async (req, res, next) => {
     }
 };
 
- 
 
- 
+
+
 
 exports.postbooking = async (req, res, next) => {
     try {
         console.log("this is from postbooking");
-        
+
         const reservationId = req.body.reservationId;
         const paymentMethod = req.body.paymentMethod || "Credit / Debit Card";
         const userId = req.session.user ? req.session.user._id : null;
@@ -229,11 +229,11 @@ exports.postbooking = async (req, res, next) => {
         await reservation.save();
 
         if (reservation.billingId) {
-            await Billing.findByIdAndUpdate(reservation.billingId, { 
-                status: 'paid', 
-                booking: userBooking._id 
+            await Billing.findByIdAndUpdate(reservation.billingId, {
+                status: 'paid',
+                booking: userBooking._id
             });
-            
+
             userBooking.billing = reservation.billingId;
             const currentBill = await Billing.findById(reservation.billingId);
             userBooking.totalPrice = (userBooking.totalPrice || 0) + (currentBill ? currentBill.totalAmount : 0);
@@ -242,47 +242,47 @@ exports.postbooking = async (req, res, next) => {
         }
 
         // Send Email to Guest and Host
-        // try {
-        //     const homeDetails = await Home.findById(homeId);
-        //     let hostName = "Host";
-        //     let hostEmail = null;
-        //     if (homeDetails.userId) {
-        //         const hostUser = await User.findById(homeDetails.userId);
-        //         if (hostUser) {
-        //             hostName = hostUser.firstName;
-        //             hostEmail = hostUser.email;
-        //         }
-        //     }
-            
-        //     await sendGuestConfirmationEmail({
-        //         guestEmail: req.session.user.email,
-        //         guestName: req.session.user.firstName,
-        //         hostName: hostName,
-        //         homeTitle: homeDetails.houseName,
-        //         checkIn: reservation.checkIn.toISOString().split('T')[0],
-        //         checkOut: reservation.checkOut.toISOString().split('T')[0],
-        //         guestsCount: reservation.members,
-        //         totalPrice: homeDetails.price
-        //     });
+        try {
+            const homeDetails = await Home.findById(homeId);
+            let hostName = "Host";
+            let hostEmail = null;
+            if (homeDetails.userId) {
+                const hostUser = await User.findById(homeDetails.userId);
+                if (hostUser) {
+                    hostName = hostUser.firstName;
+                    hostEmail = hostUser.email;
+                }
+            }
 
-        //     if (hostEmail) {
-        //         await sendHostAlertEmail({
-        //             hostEmail: hostEmail,
-        //             hostName: hostName,
-        //             guestName: req.session.user.firstName,
-        //             guestId: req.session.user._id,
-        //             guestEmail: req.session.user.email,
-        //             homeTitle: homeDetails.houseName,
-        //             checkIn: reservation.checkIn.toISOString().split('T')[0],
-        //             checkOut: reservation.checkOut.toISOString().split('T')[0],
-        //             guestsCount: reservation.members,
-        //             totalPrice: homeDetails.price,
-        //             paymentMethod: paymentMethod
-        //         });
-        //     }
-        // } catch (emailError) {
-        //     console.error("Error sending guest booking email:", emailError);
-        // }
+            await sendGuestConfirmationEmail({
+                guestEmail: req.session.user.email,
+                guestName: req.session.user.firstName,
+                hostName: hostName,
+                homeTitle: homeDetails.houseName,
+                checkIn: reservation.checkIn.toISOString().split('T')[0],
+                checkOut: reservation.checkOut.toISOString().split('T')[0],
+                guestsCount: reservation.members,
+                totalPrice: homeDetails.price
+            });
+
+            if (hostEmail) {
+                await sendHostAlertEmail({
+                    hostEmail: hostEmail,
+                    hostName: hostName,
+                    guestName: req.session.user.firstName,
+                    guestId: req.session.user._id,
+                    guestEmail: req.session.user.email,
+                    homeTitle: homeDetails.houseName,
+                    checkIn: reservation.checkIn.toISOString().split('T')[0],
+                    checkOut: reservation.checkOut.toISOString().split('T')[0],
+                    guestsCount: reservation.members,
+                    totalPrice: homeDetails.price,
+                    paymentMethod: paymentMethod
+                });
+            }
+        } catch (emailError) {
+            console.error("Error sending guest booking email:", emailError);
+        }
 
         // Fetch all booked homes to show in EJS
         const reservations = await Reservation.find({ userId: userId, status: 'Paid' }).populate('homeId').populate('billingId');
@@ -300,9 +300,9 @@ exports.postbooking = async (req, res, next) => {
         console.error("Error in postbooking:", error);
         res.status(500).send("Internal server error");
     }
-}; 
+};
 
- exports.postremovebooking = async (req, res, next) => {
+exports.postremovebooking = async (req, res, next) => {
     console.log('Form postremovebooking triggered');
     try {
         const homeId = req.params.homeId;
@@ -337,7 +337,7 @@ exports.postbooking = async (req, res, next) => {
         console.error("Error in postremovebooking:", err);
         res.status(500).send("Internal Server Error");
     }
- };
+};
 
 
 
@@ -346,9 +346,9 @@ exports.postbooking = async (req, res, next) => {
 exports.homelist = async (req, res, next) => {
     try {
         const registerHouse = await Home.find();
-        
+
         res.render('store/home-list', {
-            registerHouse: registerHouse, 
+            registerHouse: registerHouse,
             currentPage: 'homelist',
             user: req.session.user,
             isLoggedIn: req.isLoggedIn,
@@ -381,7 +381,7 @@ exports.postaddtoFavourite = async (req, res, next) => {
         req.session.user.favourite = user.favourite;
     }
     req.session.save(() => {
-        res.redirect('back'); // redirect back so user stays on the same page
+        res.redirect('/favourite'); // redirect back so user stays on the same page
     });
 };
 
@@ -448,7 +448,7 @@ exports.profile = async (req, res, next) => {
     if (!req.session.isLoggedIn) {
         return res.redirect('/login');
     }
-    
+
     const user = req.session.user;
     const userId = user._id;
     const userRole = user.userType; // 'guest' or 'host'
@@ -459,14 +459,14 @@ exports.profile = async (req, res, next) => {
         if (userRole === 'guest') {
             // Fetch bookings made by this user
             const reservations = await Reservation.find({ userId: userId }).populate('homeId');
-            
+
             bookingsData = reservations.map(resv => {
                 let homeImage = null;
                 if (resv.homeId) {
                     if (resv.homeId.photo) homeImage = resv.homeId.photo;
                     else if (resv.homeId.photos && resv.homeId.photos.length > 0) homeImage = resv.homeId.photos[0];
                 }
-                
+
                 return {
                     homeTitle: resv.homeId ? resv.homeId.houseName : 'Home Unavailable',
                     homeImage: homeImage,
@@ -475,7 +475,7 @@ exports.profile = async (req, res, next) => {
                     status: resv.status
                 };
             });
-            
+
         } else if (userRole === 'host') {
             // Find homes created by the host
             const hostHomes = await Home.find({ userId: userId });
@@ -534,18 +534,18 @@ exports.viewInvoice = async (req, res, next) => {
     try {
         const reservationId = req.params.reservationId;
         const reservation = await Reservation.findById(reservationId).populate('homeId').populate('billingId').populate('userId');
-        
+
         // Ensure reservation and its billing exist before proceeding
         if (!reservation || !reservation.billingId) {
             console.log("Invoice not found or billing is missing for reservation:", reservationId);
             return res.redirect('/booking');
         }
-        
+
         let host = null;
         if (reservation.homeId && reservation.homeId.userId) {
             host = await User.findById(reservation.homeId.userId);
         }
-        
+
         res.render('store/invoice', {
             reservation: reservation,
             billing: reservation.billingId,
