@@ -3,6 +3,7 @@
 const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer');
 const { check, validationResult } = require('express-validator');
+const { sendPasswordResetEmail } = require('../utils/email');
   // Adjust path as needed
 
 
@@ -11,13 +12,14 @@ const { check, validationResult } = require('express-validator');
  
 
 // Configure nodemailer (update with your email service)
-const transporter = nodemailer.createTransport({
-  service: 'gmail', // or your email service
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
-  }
-});
+// Note: Now using SendGrid via utils/email.js
+// const transporter = nodemailer.createTransport({
+//   service: 'gmail', // or your email service
+//   auth: {
+//     user: process.env.EMAIL_USER,
+//     pass: process.env.EMAIL_PASS
+//   }
+// });
 
 
 // GET /forgot-password - Render forgot password form
@@ -25,7 +27,8 @@ exports.getForgotPassword = (req, res) => {
   res.render('auth/forgot-password', {
     title: 'Forgot Password',
     errorMessage: null,
-    successMessage: null
+    successMessage: null,
+    currentPage: 'homeadd'
   });
 };
 
@@ -39,7 +42,8 @@ exports.postForgotPassword = async (req, res) => {
       return res.render('auth/forgot-password', {
         title: 'Forgot Password',
         errorMessage: 'Please provide an email address',
-        successMessage: null
+        successMessage: null,
+        currentPage: 'homeadd'
       });
     }
 
@@ -67,38 +71,18 @@ exports.postForgotPassword = async (req, res) => {
     // Create reset URL
     const resetUrl = `${req.protocol}://${req.get('host')}/reset-password/${resetToken}`;
 
-    // Email content
-    const mailOptions = {
-      from: process.env.EMAIL_USER,
-      to: user.email,
-      subject: 'Password Reset Request',
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2>Password Reset Request</h2>
-          <p>Hello ${user.name || 'User'},</p>
-          <p>You requested a password reset for your account. Click the link below to reset your password:</p>
-          <div style="text-align: center; margin: 30px 0;">
-            <a href="${resetUrl}" style="background-color: #007bff; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block;">
-              Reset Password
-            </a>
-          </div>
-          <div>
-           ${resetUrl}
-          </div>
-          <p>This link will expire in 1 hour.</p>
-          <p>If you didn't request this password reset, please ignore this email.</p>
-          <p>Best regards,<br>Your App Team</p>
-        </div>
-      `
-    };
-
-    // Send email
-    await transporter.sendMail(mailOptions);
+    // Send password reset email using SendGrid
+    await sendPasswordResetEmail({
+      email: user.email,
+      name: user.name,
+      resetUrl: resetUrl
+    });
 
     res.render('auth/forgot-password', {
       title: 'Forgot Password',
       errorMessage: null,
-      successMessage: 'Password reset link has been sent to your email address.'
+      successMessage: 'Password reset link has been sent to your email address.',
+      currentPage: 'homeadd'
     });
 
   } catch (error) {
@@ -305,7 +289,8 @@ exports.postResetPassword = async (req, res) => {
        oldInput:"",
       title: 'Login',
       errorMessage: null,
-      successMessage: 'Password reset successful! You can now login with your new password.'
+      successMessage: 'Password reset successful! You can now login with your new password.',
+      currentPage: 'homeadd'
     });
 
   } catch (error) {

@@ -1,90 +1,150 @@
-const nodemailer = require('nodemailer');
-require('dotenv').config();
+const nodemailer = require("nodemailer");
+require("dotenv").config();
 
+// ✅ Create transporter (Gmail)
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  secure: true,
+  service: "gmail",
   auth: {
     user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
-  }
+    pass: process.env.EMAIL_PASS, // App Password
+  },
 });
 
-const sendGuestConfirmationEmail = async ({ guestEmail, guestName, hostName, homeTitle, checkIn, checkOut, guestsCount, totalPrice }) => {
+// ===============================
+// 📧 Guest Email
+// ===============================
+const sendGuestConfirmationEmail = async ({
+  guestEmail,
+  guestName,
+  hostName,
+  homeTitle,
+  checkIn,
+  checkOut,
+  guestsCount,
+  totalPrice,
+}) => {
   try {
-    console.log("📧 Sending booking notification email to GUEST...");
+    console.log("📧 Sending booking email to GUEST...");
+
     await transporter.sendMail({
       from: `"Airbnb Clone" <${process.env.EMAIL_USER}>`,
-      to: guestEmail, 
+      to: guestEmail,
       subject: `Booking Confirmed: ${homeTitle}`,
       html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
-          <h2 style="color: #FF5A5F;">Booking Confirmation! 🎉</h2>
-          <p>Hi ${guestName},</p>
-          <p>Your booking for <strong>${homeTitle}</strong> has been successfully confirmed. We are excited for your upcoming trip!</p>
-          
-          <div style="background: #f8f8f8; padding: 15px; border-radius: 8px; margin: 20px 0;">
-            <h3 style="margin-top: 0;">Reservation Details:</h3>
-            <p><strong>Check-in:</strong> ${checkIn}</p>
-            <p><strong>Check-out:</strong> ${checkOut}</p>
-            <p><strong>Guests:</strong> ${guestsCount}</p>
-            <p><strong>Total Price Paid:</strong> $${totalPrice}</p>
-          </div>
+        <h2>Booking Confirmed 🎉</h2>
+        <p>Hi ${guestName},</p>
+        <p>Your booking for <b>${homeTitle}</b> is confirmed.</p>
 
-          <p>If you have any questions, feel free to reach out to your host, ${hostName}.</p>
-          <p>Safe travels,</p>
-          <p><strong>The Airbnb Clone Team</strong></p>
-        </div>
+        <h3>Details:</h3>
+        <p>Check-in: ${checkIn}</p>
+        <p>Check-out: ${checkOut}</p>
+        <p>Guests: ${guestsCount}</p>
+        <p>Total Price: $${totalPrice}</p>
+
+        <p>Host: ${hostName}</p>
+        <br/>
+        <p>Thanks for booking!</p>
       `,
     });
-    console.log("✅ Guest confirmation email sent successfully");
+
+    console.log("✅ Guest email sent");
   } catch (error) {
-    console.error("❌ Email Error (Guest):", error.message);
+    console.error("❌ Guest Email Error:", error.message);
   }
 };
 
-const sendHostAlertEmail = async ({ hostEmail, hostName, guestName, guestId, guestEmail, homeTitle, checkIn, checkOut, guestsCount, totalPrice, paymentMethod }) => {
+// ===============================
+// 📧 Host Email
+// ===============================
+const sendHostAlertEmail = async ({
+  hostEmail,
+  hostName,
+  guestName,
+  guestId,
+  guestEmail,
+  homeTitle,
+  checkIn,
+  checkOut,
+  guestsCount,
+  totalPrice,
+  paymentMethod,
+}) => {
   try {
-    console.log("📧 Sending booking notification email to HOST...");
+    console.log("📧 Sending booking email to HOST...");
+
     if (!hostEmail) return;
 
     await transporter.sendMail({
       from: `"Airbnb Clone" <${process.env.EMAIL_USER}>`,
-      to: hostEmail, 
-      subject: `New Confirmed Booking: ${homeTitle}`,
+      to: hostEmail,
+      subject: `New Booking: ${homeTitle}`,
       html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
-          <h2 style="color: #00A699;">New Confirmed Booking! 🔔</h2>
-          <p>Hi ${hostName},</p>
-          <p>Great news! <strong>${guestName}</strong> has successfully booked your property, <strong>${homeTitle}</strong>.</p>
-          
-          <div style="background: #f8f8f8; padding: 15px; border-radius: 8px; margin: 20px 0;">
-            <h3 style="margin-top: 0;">Booking & Guest Details:</h3>
-            <p><strong>Guest Name:</strong> ${guestName}</p>
-            <p><strong>Guest ID:</strong> ${guestId}</p>
-            <p><strong>Guest Email:</strong> ${guestEmail}</p>
-            <hr style="border-top: 1px solid #ddd; margin: 10px 0;" />
-            <p><strong>Check-in:</strong> ${checkIn}</p>
-            <p><strong>Check-out:</strong> ${checkOut}</p>
-            <p><strong>Members (Guests):</strong> ${guestsCount}</p>
-            <hr style="border-top: 1px solid #ddd; margin: 10px 0;" />
-            <p><strong>Total Amount:</strong> $${totalPrice}</p>
-            <p><strong>Payment Method:</strong> ${paymentMethod}</p>
-          </div>
+        <h2>New Booking Alert 🔔</h2>
+        <p>Hi ${hostName},</p>
 
-          <p>The payment has been successfully processed. Please make sure the property is ready for their arrival.</p>
-          <p>Happy Hosting,</p>
-          <p><strong>The Airbnb Clone Team</strong></p>
-        </div>
+        <p><b>${guestName}</b> booked your property: <b>${homeTitle}</b></p>
+
+        <h3>Booking Details:</h3>
+        <p>Check-in: ${checkIn}</p>
+        <p>Check-out: ${checkOut}</p>
+        <p>Guests: ${guestsCount}</p>
+
+        <h3>Guest Info:</h3>
+        <p>Name: ${guestName}</p>
+        <p>Email: ${guestEmail}</p>
+        <p>ID: ${guestId}</p>
+
+        <h3>Payment:</h3>
+        <p>Total: $${totalPrice}</p>
+        <p>Method: ${paymentMethod}</p>
+
+        <br/>
+        <p>Please prepare your property.</p>
       `,
     });
-    console.log("✅ Host alert email sent successfully");
+
+    console.log("✅ Host email sent");
   } catch (error) {
-    console.error("❌ Email Error (Host):", error.message);
+    console.error("❌ Host Email Error:", error.message);
   }
 };
 
+// ===============================
+// 🔐 Password Reset Email
+// ===============================
+const sendPasswordResetEmail = async ({ email, name, resetUrl }) => {
+  try {
+    console.log("📧 Sending password reset email...");
+
+    await transporter.sendMail({
+      from: `"Airbnb Clone" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: "Password Reset Request",
+      html: `
+        <h2>Password Reset</h2>
+        <p>Hello ${name || "User"},</p>
+
+        <p>Click below to reset your password:</p>
+
+        <a href="${resetUrl}" 
+           style="background:#007bff;color:white;padding:10px 20px;text-decoration:none;border-radius:5px;">
+           Reset Password
+        </a>
+
+        <p>This link expires in 1 hour.</p>
+      `,
+    });
+
+    console.log("✅ Password reset email sent");
+  } catch (error) {
+    console.error("❌ Reset Email Error:", error.message);
+    throw error;
+  }
+};
+
+// ===============================
 module.exports = {
   sendGuestConfirmationEmail,
-  sendHostAlertEmail
+  sendHostAlertEmail,
+  sendPasswordResetEmail,
 };
